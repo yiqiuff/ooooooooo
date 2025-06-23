@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星觅三角洲俱乐部</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        /* 开屏公告 */
+        .splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .splash h2 {
+            color: #ffcc00;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .splash-content {
+            background-color: #222;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+        
+        .splash-content p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .close-splash {
+            margin-top: 20px;
+            padding: 10px 30px;
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        /* 顶部导航 */
+        .header {
+            background-color: #1a1a2e;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            margin: 0;
+        }
+        
+        .user-info {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        /* 滚动广告 */
+        .banner {
+            height: 40vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .banner-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            color: white;
+            padding: 15px;
+        }
+        
+        .banner-text h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .banner-text p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* 分类导航 */
+        .category-nav {
+            display: flex;
+            overflow-x: auto;
+            background-color: white;
+            padding: 10px 0;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .category-item {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 0 5px;
+            background-color: #f0f0f0;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .category-item.active {
+            background-color: #1a1a2e;
+            color: white;
+        }
+        
+        /* 商品列表 */
+        .product-section {
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .product-section.active {
+            display: block;
+        }
+        
+        .section-title {
+            background-color: #1a1a2e;
+            color: white;
+            padding: 10px 15px;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .products {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 10px;
+            background-color: white;
+        }
+        
+        .product-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .product-card:active {
+            transform: scale(0.98);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+        
+        .product-info {
+            padding: 10px;
+        }
+        
+        .product-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .product-price {
+            color: #ff6600;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        /* 商品详情弹窗 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            background-color: #1a1a2e;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 15px;
+        }
+        
+        .modal-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .modal-price {
+            color: #ff6600;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .modal-desc {
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .order-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        /* 支付弹窗 */
+        .payment-methods {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        
+        .payment-method {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .payment-icon {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 5px;
+        }
+        
+        /* 底部导航 */
+        .footer-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+        
+        .nav-item.active {
+            color: #1a1a2e;
+        }
+        
+        /* 个人中心页面 */
+        .profile-page, .other-page {
+            display: none;
+            padding: 15px;
+            padding-bottom: 70px;
+            background-color: white;
+            min-height: 100vh;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        
+        .profile-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .profile-id {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .order-status {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .status-count {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff6600;
+            margin-bottom: 5px;
+        }
+        
+        .status-title {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .menu-list {
+            margin-top: 20px;
+        }
+        
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            color: #666;
+        }
+        
+        .menu-text {
+            font-size: 15px;
+        }
+        
+        .menu-arrow {
+            color: #999;
+        }
+        
+        /* 客服页面 */
+        .customer-service {
+            text-align: center;
+            padding: 30px 15px;
+        }
+        
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            background-color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #666;
+        }
+        
+        .service-tip {
+            color: #666;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+        
+        /* 保证金页面 */
+        .deposit-amounts {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .amount-option {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .amount-option.selected {
+            border-color: #ff6600;
+            background-color: #fff8f0;
+        }
+        
+        .amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff6600;
+        }
+        
+        /* 打手中心 */
+        .hunter-form {
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #1a1a2e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        /* 管理监控系统 */
+        .admin-dashboard {
+            padding: 15px;
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a1a2e;
+        }
+        
+        .recent-orders {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .orders-title {
+            font-size: 16px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-id {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .order-amount {
+            font-weight: bold;
+        }
+        
+        /* 响应式调整 */
+        @media (min-width: 768px) {
+            .products {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .deposit-amounts {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .stats-cards {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 开屏公告 -->
+        <div class="splash" id="splash">
+            <div class="splash-content">
+                <h2>星觅俱乐部平台公告</h2>
+                <p>尊敬的玩家，欢迎来到星觅三角洲俱乐部！</p>
+                <p>1. 本平台所有交易均受平台担保，请勿私下交易以防被骗</p>
+                <p>2. 交易完成后请及时确认收货，如有问题请联系客服</p>
+                <p>3. 打手入驻需缴纳保证金，违规操作将扣除保证金</p>
+                <p>4. 平台严禁任何形式的欺诈行为，违者永久封号</p>
+                <p>5. 有问题及时联系客服处理</p>
+                <p>祝您游戏愉快，把把大红！</p>
+            </div>
+            <button class="close-splash" id="closeSplash">我知道了</button>
+        </div>
+        
+        <!-- 主页面 -->
+        <div class="main-page" id="mainPage">
+            <!-- 顶部导航 -->
+            <header class="header">
+                <h1>星觅三角洲俱乐部</h1>
+                <div class="user-info" id="userInfo">
+                    <img src="https://via.placeholder.com/30" alt="头像" class="user-avatar">
+                    <span>未登录</span>
+                </div>
+            </header>
+            
+            <!-- 滚动广告 -->
+            <div class="banner">
+                <img src="https://via.placeholder.com/600x300?text=三角洲行动广告" alt="广告图">
+                <div class="banner-text">
+                    <h2>新赛季开启！限时优惠</h2>
+                    <p>所有订单满200减20，活动截止6月30日</p>
+                </div>
+            </div>
+            
+            <!-- 分类导航 -->
+            <div class="category-nav" id="categoryNav">
+                <div class="category-item active" data-category="secret">机密单</div>
+                <div class="category-item" data-category="topSecret">绝密单</div>
+                <div class="category-item" data-category="crash">撞车单</div>
+                <div class="category-item" data-category="bigRed">大红单</div>
+                <div class="category-item" data-category="companion">陪玩单</div>
+                <div class="category-item" data-category="singleBigRed">单局大红单</div>
+                <div class="category-item" data-category="singleValue">单局带出价值</div>
+                <div class="category-item" data-category="africa">非洲之心单</div>
+                <div class="category-item" data-category="farming">代肝单</div>
+                <div class="category-item" data-category="rebate">大红返现单</div>
+            </div>
+            
+            <!-- 商品列表 -->
+            <div class="product-section active" id="secret">
+                <div class="section-title">
+                    <span>机密单</span>
+                    <span>高性价比保障</span>
+                </div>
+                <div class="products">
+                    <!-- 机密单商品 -->
+                    <div class="product-card" data-id="secret1" onclick="showProductDetail('secret1')">
+                        <img src="https://via.placeholder.com/300x200?text=机密单49.9" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">49.9保底200w</div>
+                            <div class="product-price">¥49.90</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="secret2" onclick="showProductDetail('secret2')">
+                        <img src="https://via.placeholder.com/300x200?text=机密单69" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">69保350w</div>
+                            <div class="product-price">¥69.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="secret3" onclick="showProductDetail('secret3')">
+                        <img src="https://via.placeholder.com/300x200?text=机密单99" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">99保500w</div>
+                            <div class="product-price">¥99.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="product-section" id="topSecret">
+                <div class="section-title">
+                    <span>绝密单</span>
+                    <span>高端保障服务</span>
+                </div>
+                <div class="products">
+                    <!-- 绝密单商品 -->
+                    <div class="product-card" data-id="topSecret1" onclick="showProductDetail('topSecret1')">
+                        <img src="https://via.placeholder.com/300x200?text=绝密单88.88" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">88.88保底450w</div>
+                            <div class="product-price">¥88.88</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="topSecret2" onclick="showProductDetail('topSecret2')">
+                        <img src="https://via.placeholder.com/300x200?text=绝密单118" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">118保底600w</div>
+                            <div class="product-price">¥118.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="topSecret3" onclick="showProductDetail('topSecret3')">
+                        <img src="https://via.placeholder.com/300x200?text=绝密单168" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">168保底1200w</div>
+                            <div class="product-price">¥168.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="topSecret4" onclick="showProductDetail('topSecret4')">
+                        <img src="https://via.placeholder.com/300x200?text=绝密单288" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">288保底2000w</div>
+                            <div class="product-price">¥288.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="product-section" id="crash">
+                <div class="section-title">
+                    <span>撞车单</span>
+                    <span>高风险高回报</span>
+                </div>
+                <div class="products">
+                    <!-- 撞车单商品 -->
+                    <div class="product-card" data-id="crash1" onclick="showProductDetail('crash1')">
+                        <img src="https://via.placeholder.com/300x200?text=撞车单140" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">140撞车1000w哈夫币</div>
+                            <div class="product-price">¥140.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="crash2" onclick="showProductDetail('crash2')">
+                        <img src="https://via.placeholder.com/300x200?text=撞车单380" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">380撞车3000w哈夫币</div>
+                            <div class="product-price">¥380.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="crash3" onclick="showProductDetail('crash3')">
+                        <img src="https://via.placeholder.com/300x200?text=撞车单175" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">175撞车50发awm子弹</div>
+                            <div class="product-price">¥175.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="crash4" onclick="showProductDetail('crash4')">
+                        <img src="https://via.placeholder.com/300x200?text=撞车单670" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">670撞车5000w哈夫币</div>
+                            <div class="product-price">¥670.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="crash5" onclick="showProductDetail('crash5')">
+                        <img src="https://via.placeholder.com/300x200?text=撞车单1250" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">1250撞车1亿哈夫币</div>
+                            <div class="product-price">¥1250.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="product-section" id="bigRed">
+                <div class="section-title">
+                    <span>大红单</span>
+                    <span>必出保障</span>
+                </div>
+                <div class="products">
+                    <!-- 大红单商品 -->
+                    <div class="product-card" data-id="bigRed1" onclick="showProductDetail('bigRed1')">
+                        <img src="https://via.placeholder.com/300x200?text=大红单238" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">238保底一个大红</div>
+                            <div class="product-price">¥238.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="bigRed2" onclick="showProductDetail('bigRed2')">
+                        <img src="https://via.placeholder.com/300x200?text=大红单388" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">388保底12格大红</div>
+                            <div class="product-price">¥388.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="product-section" id="companion">
+                <div class="section-title">
+                    <span>陪玩单</span>
+                    <span>专业陪伴</span>
+                </div>
+                <div class="products">
+                    <!-- 陪玩单商品 -->
+                    <div class="product-card" data-id="companion1" onclick="showProductDetail('companion1')">
+                        <img src="https://via.placeholder.com/300x200?text=陪玩单66" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">66女陪一小时（娱乐）</div>
+                            <div class="product-price">¥66.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="companion2" onclick="showProductDetail('companion2')">
+                        <img src="https://via.placeholder.com/300x200?text=陪玩单78" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">78技术男陪一小时</div>
+                            <div class="product-price">¥78.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="companion3" onclick="showProductDetail('companion3')">
+                        <img src="https://via.placeholder.com/300x200?text=陪玩单118" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">118技术女陪一小时</div>
+                            <div class="product-price">¥118.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="companion4" onclick="showProductDetail('companion4')">
+                        <img src="https://via.placeholder.com/300x200?text=陪玩单158" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">158单局700w</div>
+                            <div class="product-price">¥158.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="companion5" onclick="showProductDetail('companion5')">
+                        <img src="https://via.placeholder.com/300x200?text=陪玩单488" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">488单局1000w</div>
+                            <div class="product-price">¥488.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="companion6" onclick="showProductDetail('companion6')">
+                        <img src="https://via.placeholder.com/300x200?text=陪玩单238" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">238单局800w</div>
+                            <div class="product-price">¥238.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="companion7" onclick="showProductDetail('companion7')">
+                        <img src="https://via.placeholder.com/300x200?text=陪玩单118" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">118单局560w</div>
+                            <div class="product-price">¥118.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="product-section" id="singleBigRed">
+                <div class="section-title">
+                    <span>单局大红单</span>
+                    <span>单局必出</span>
+                </div>
+                <div class="products">
+                    <!-- 单局大红单商品 -->
+                    <div class="product-card" data-id="singleBigRed1" onclick="showProductDetail('singleBigRed1')">
+                        <img src="https://via.placeholder.com/300x200?text=单局大红单" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">单局大红保障</div>
+                            <div class="product-price">¥299.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="product-section" id="singleValue">
+                <div class="section-title">
+                    <span>单局带出价值</span>
+                    <span>高价值撤离</span>
+                </div>
+                <div class="products">
+                    <!-- 单局带出价值商品 -->
+                    <div class="product-card" data-id="singleValue1" onclick="showProductDetail('singleValue1')">
+                        <img src="https://via.placeholder.com/300x200?text=单局带出价值" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">高价值撤离保障</div>
+                            <div class="product-price">¥199.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="product-section" id="africa">
+                <div class="section-title">
+                    <span>非洲之心单</span>
+                    <span>稀有物品保障</span>
+                </div>
+                <div class="products">
+                    <!-- 非洲之心单商品 -->
+                    <div class="product-card" data-id="africa1" onclick="showProductDetail('africa1')">
+                        <img src="https://via.placeholder.com/300x200?text=非洲之心999" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">999手搓非洲之心</div>
+                            <div class="product-price">¥999.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="africa2" onclick="showProductDetail('africa2')">
+                        <img src="https://via.placeholder.com/300x200?text=非洲之心666" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">666不出保底3888w</div>
+                            <div class="product-price">¥666.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="product-section" id="farming">
+                <div class="section-title">
+                    <span>代肝单</span>
+                    <span>解放你的时间</span>
+                </div>
+                <div class="products">
+                    <!-- 代肝单商品 -->
+                    <div class="product-card" data-id="farming1" onclick="showProductDetail('farming1')">
+                        <img src="https://via.placeholder.com/300x200?text=代肝单110" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">110代肝1000w</div>
+                            <div class="product-price">¥110.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="farming2" onclick="showProductDetail('farming2')">
+                        <img src="https://via.placeholder.com/300x200?text=代肝单999" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">999代肝9格保险</div>
+                            <div class="product-price">¥999.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="farming3" onclick="showProductDetail('farming3')">
+                        <img src="https://via.placeholder.com/300x200?text=代肝单188" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">188代肝带砖杀人任务</div>
+                            <div class="product-price">¥188.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="farming4" onclick="showProductDetail('farming4')">
+                        <img src="https://via.placeholder.com/300x200?text=代肝单300" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">300代肝300w</div>
+                            <div class="product-price">¥300.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="farming5" onclick="showProductDetail('farming5')">
+                        <img src="https://via.placeholder.com/300x200?text=代肝单500" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">500代肝5000w</div>
+                            <div class="product-price">¥500.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="farming6" onclick="showProductDetail('farming6')">
+                        <img src="https://via.placeholder.com/300x200?text=代肝单999" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">999代肝一个亿</div>
+                            <div class="product-price">¥999.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="product-section" id="rebate">
+                <div class="section-title">
+                    <span>大红返现单</span>
+                    <span>惊喜返现</span>
+                </div>
+                <div class="products">
+                    <!-- 大红返现单商品 -->
+                    <div class="product-card" data-id="rebate1" onclick="showProductDetail('rebate1')">
+                        <img src="https://via.placeholder.com/300x200?text=大红返现单" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">打绝密保底388w</div>
+                            <div class="product-price">¥199.00</div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-id="rebate2" onclick="showProductDetail('rebate2')">
+                        <img src="https://via.placeholder.com/300x200?text=大红返现单" class="product-image">
+                        <div class="product-info">
+                            <div class="product-title">出指定大红返现88.88</div>
+                            <div class="product-price">¥299.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 个人中心页面 -->
+        <div class="profile-page" id="profilePage">
+            <div class="profile-header">
+                <img src="https://via.placeholder.com/60" alt="头像" class="profile-avatar" id="profileAvatar">
+                <div>
+                    <div class="profile-name" id="profileName">未登录</div>
+                    <div class="profile-id" id="profileId">ID: --</div>
+                </div>
+            </div>
+            
+            <div class="order-status">
+                <div class="status-item">
+                    <div class="status-count" id="pendingPayment">0</div>
+                    <div class="status-title">待付款</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-count" id="pendingOrder">0</div>
+                    <div class="status-title">待接单</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-count" id="inService">0</div>
+                    <div class="status-title">服务中</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-count" id="pendingCompletion">0</div>
+                    <div class="status-title">待结单</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-count" id="completed">0</div>
+                    <div class="status-title">已完成</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-count" id="afterSale">0</div>
+                    <div class="status-title">售后</div>
+                </div>
+            </div>
+            
+            <div class="menu-list">
+                <div class="menu-item" onclick="showPage('customerService')">
+                    <div class="menu-left">
+                        <i class="fas fa-headset menu-icon"></i>
+                        <span class="menu-text">联系客服</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+                <div class="menu-item" onclick="showPage('deposit')">
+                    <div class="menu-left">
+                        <i class="fas fa-shield-alt menu-icon"></i>
+                        <span class="menu-text">充保证金</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+                <div class="menu-item" onclick="showPage('hunterCenter')">
+                    <div class="menu-left">
+                        <i class="fas fa-user-shield menu-icon"></i>
+                        <span class="menu-text">打手中心</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+                <div class="menu-item" onclick="logout()">
+                    <div class="menu-left">
+                        <i class="fas fa-sign-out-alt menu-icon"></i>
+                        <span class="menu-text">退出登录</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 客服页面 -->
+        <div class="other-page" id="customerService">
+            <div class="section-title" onclick="showPage('profilePage')">
+                <i class="fas fa-arrow-left"></i>
+                <span>联系客服</span>
+                <span></span>
+            </div>
+            <div class="customer-service">
+                <h3>扫描下方二维码添加客服微信</h3>
+                <div class="qr-code">
+                    <span>客服微信二维码</span>
+                </div>
+                <p class="service-tip">添加时请备注您的订单号或用户名</p>
+                <p class="service-tip">客服工作时间：9:00-24:00</p>
+            </div>
+        </div>
+        
+        <!-- 保证金页面 -->
+        <div class="other-page" id="deposit">
+            <div class="section-title" onclick="showPage('profilePage')">
+                <i class="fas fa-arrow-left"></i>
+                <span>充保证金</span>
+                <span></span>
+            </div>
+            <div style="padding: 15px;">
+                <h3>选择充值金额</h3>
+                <p style="color: #666; margin: 10px 0; font-size: 14px;">打手需缴纳保证金才能接单，违规操作将扣除保证金</p>
+                
+                <div class="deposit-amounts">
+                    <div class="amount-option" onclick="selectAmount(this, 100)">
+                        <div class="amount">¥100</div>
+                    </div>
+                    <div class="amount-option" onclick="selectAmount(this, 200)">
+                        <div class="amount">¥200</div>
+                    </div>
+                    <div class="amount-option" onclick="selectAmount(this, 300)">
+                        <div class="amount">¥300</div>
+                    </div>
+                    <div class="amount-option" onclick="selectAmount(this, 500)">
+                        <div class="amount">¥500</div>
+                    </div>
+                    <div class="amount-option" onclick="selectAmount(this, 800)">
+                        <div class="amount">¥800</div>
+                    </div>
+                    <div class="amount-option" onclick="selectAmount(this, 1000)">
+                        <div class="amount">¥1000</div>
+                    </div>
+                    <div class="amount-option" onclick="selectAmount(this, 1500)">
+                        <div class="amount">¥1500</div>
+                    </div>
+                    <div class="amount-option" onclick="selectAmount(this, 2000)">
+                        <div class="amount">¥2000</div>
+                    </div>
+                </div>
+                
+                <button class="order-btn" onclick="showPaymentModal('deposit')">立即充值</button>
+            </div>
+        </div>
+        
+        <!-- 打手中心 -->
+        <div class="other-page" id="hunterCenter">
+            <div class="section-title" onclick="showPage('profilePage')">
+                <i class="fas fa-arrow-left"></i>
+                <span>打手中心</span>
+                <span></span>
+            </div>
+            <div style="padding: 15px;">
+                <h3>打手入驻申请</h3>
+                <p style="color: #666; margin: 10px 0; font-size: 14px;">填写以下信息申请成为平台打手</p>
+                
+                <div class="hunter-form">
+                    <div class="form-group">
+                        <label class="form-label">真实姓名</label>
+                        <input type="text" class="form-input" id="realName" placeholder="请输入真实姓名">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">手机号码</label>
+                        <input type="tel" class="form-input" id="phoneNumber" placeholder="请输入手机号码">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">游戏ID</label>
+                        <input type="text" class="form-input" id="gameId" placeholder="请输入游戏ID">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">擅长服务</label>
+                        <input type="text" class="form-input" id="goodAt" placeholder="例如：机密单、大红单等">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">游戏时长</label>
+                        <input type="text" class="form-input" id="playTime" placeholder="例如：500小时">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">个人简介</label>
+                        <textarea class="form-input" id="introduction" placeholder="简要介绍您的游戏经历和特长" rows="3"></textarea>
+                    </div>
+                    
+                    <button class="submit-btn" onclick="submitHunterApplication()">提交申请</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 管理监控系统 -->
+        <div class="other-page" id="adminDashboard">
+            <div class="section-title" onclick="showPage('profilePage')">
+                <i class="fas fa-arrow-left"></i>
+                <span>管理监控</span>
+                <span></span>
+            </div>
+            <div class="admin-dashboard">
+                <h3>平台数据概览</h3>
+                
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-title">今日订单</div>
+                        <div class="stat-value">128</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">今日成交额</div>
+                        <div class="stat-value">¥12,856</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">注册用户</div>
+                        <div class="stat-value">2,456</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">认证打手</div>
+                        <div class="stat-value">186</div>
+                    </div>
+                </div>
+                
+                <div class="recent-orders">
+                    <div class="orders-title">最近订单</div>
+                    <div class="order-item">
+                        <div class="order-id">订单 #20230615001</div>
+                        <div class="order-amount">¥288.00</div>
+                    </div>
+                    <div class="order-item">
+                        <div class="order-id">订单 #20230615002</div>
+                        <div class="order-amount">¥118.00</div>
+                    </div>
+                    <div class="order-item">
+                        <div class="order-id">订单 #20230615003</div>
+                        <div class="order-amount">¥666.00</div>
+                    </div>
+                    <div class="order-item">
+                        <div class="order-id">订单 #20230615004</div>
+                        <div class="order-amount">¥99.00</div>
+                    </div>
+                    <div class="order-item">
+                        <div class="order-id">订单 #20230615005</div>
+                        <div class="order-amount">¥388.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 商品详情弹窗 -->
+        <div class="modal" id="productModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>商品详情</h3>
+                    <button class="close-modal" onclick="closeModal('productModal')">&times;</button>
+                </div>
+                <div class="modal-body" id="productModalBody">
+                    <!-- 内容由JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 支付弹窗 -->
+        <div class="modal" id="paymentModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>支付订单</h3>
+                    <button class="close-modal" onclick="closeModal('paymentModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h3 id="paymentAmount">¥0.00</h3>
+                        <p id="paymentDesc">商品描述</p>
+                    </div>
+                    
+                    <div class="payment-methods">
+                        <div class="payment-method" onclick="selectPayment('wechat')">
+                            <img src="https://via.placeholder.com/50x50?text=微信" class="payment-icon">
+                            <span>微信支付</span>
+                        </div>
+                        <div class="payment-method" onclick="selectPayment('alipay')">
+                            <img src="https://via.placeholder.com/50x50?text=支付宝" class="payment-icon">
+                            <span>支付宝</span>
+                        </div>
+                    </div>
+                    
+                    <button class="order-btn" onclick="confirmPayment()">立即支付</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部导航 -->
+        <div class="footer-nav">
+            <div class="nav-item active" onclick="showPage('mainPage')">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" onclick="showPage('profilePage')">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+            <div class="nav-item" onclick="showPage('adminDashboard')">
+                <i class="fas fa-chart-line"></i>
+                <span>管理</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 商品数据
+        const products = {
+            secret1: {
+                title: "49.9保底200w",
+                price: 49.9,
+                image: "https://via.placeholder.com/500x300?text=机密单49.9",
+                desc: "支付49.9元，保障单局带出至少200w哈夫币价值，不足部分补足。专业打手操作，高效安全。"
+            },
+            secret2: {
+                title: "69保350w",
+                price: 69,
+                image: "https://via.placeholder.com/500x300?text=机密单69",
+                desc: "支付69元，保障单局带出至少350w哈夫币价值，不足部分补足。专业打手操作，高效安全。"
+            },
+            secret3: {
+                title: "99保500w",
+                price: 99,
+                image: "https://via.placeholder.com/500x300?text=机密单99",
+                desc: "支付99元，保障单局带出至少500w哈夫币价值，不足部分补足。专业打手操作，高效安全。"
+            },
+            topSecret1: {
+                title: "88.88保底450w",
+                price: 88.88,
+                image: "https://via.placeholder.com/500x300?text=绝密单88.88",
+                desc: "支付88.88元，保障单局带出至少450w哈夫币价值，不足部分补足。高端服务，专属打手。"
+            },
+            topSecret2: {
+                title: "118保底600w",
+                price: 118,
+                image: "https://via.placeholder.com/500x300?text=绝密单118",
+                desc: "支付118元，保障单局带出至少600w哈夫币价值，不足部分补足。高端服务，专属打手。"
+            },
+            topSecret3: {
+                title: "168保底1200w",
+                price: 168,
+                image: "https://via.placeholder.com/500x300?text=绝密单168",
+                desc: "支付168元，保障单局带出至少1200w哈夫币价值，不足部分补足。高端服务，专属打手。"
+            },
+            topSecret4: {
+                title: "288保底2000w",
+                price: 288,
+                image: "https://via.placeholder.com/500x300?text=绝密单288",
+                desc: "支付288元，保障单局带出至少2000w哈夫币价值，不足部分补足。高端服务，专属打手。"
+            },
+            crash1: {
+                title: "140撞车1000w哈夫币",
+                price: 140,
+                image: "https://via.placeholder.com/500x300?text=撞车单140",
+                desc: "支付140元，专业撞车服务，保障单局带出1000w哈夫币价值。高风险高回报，适合进阶玩家。"
+            },
+            crash2: {
+                title: "380撞车3000w哈夫币",
+                price: 380,
+                image: "https://via.placeholder.com/500x300?text=撞车单380",
+                desc: "支付380元，专业撞车服务，保障单局带出3000w哈夫币价值。高风险高回报，适合进阶玩家。"
+            },
+            crash3: {
+                title: "175撞车50发awm子弹",
+                price: 175,
+                image: "https://via.placeholder.com/500x300?text=撞车单175",
+                desc: "支付175元，专业撞车服务，保障获取50发awm子弹。高风险高回报，适合进阶玩家。"
+            },
+            crash4: {
+                title: "670撞车5000w哈夫币",
+                price: 670,
+                image: "https://via.placeholder.com/500x300?text=撞车单670",
+                desc: "支付670元，专业撞车服务，保障单局带出5000w哈夫币价值。高风险高回报，适合进阶玩家。"
+            },
+            crash5: {
+                title: "1250撞车1亿哈夫币",
+                price: 1250,
+                image: "https://via.placeholder.com/500x300?text=撞车单1250",
+                desc: "支付1250元，专业撞车服务，保障单局带出1亿哈夫币价值。高风险高回报，适合资深玩家。"
+            },
+            bigRed1: {
+                title: "238保底一个大红",
+                price: 238,
+                image: "https://via.placeholder.com/500x300?text=大红单238",
+                desc: "支付238元，保障单局带出一个大红物品，不出一直打。专业打手操作，必出保障。"
+            },
+            bigRed2: {
+                title: "388保底12格大红",
+                price: 388,
+                image: "https://via.placeholder.com/500x300?text=大红单388",
+                desc: "支付388元，保障单局带出12格大红物品，不出一直打。专业打手操作，必出保障。"
+            },
+            companion1: {
+                title: "66女陪一小时（娱乐）",
+                price: 66,
+                image: "https://via.placeholder.com/500x300?text=陪玩单66",
+                desc: "支付66元，女性陪玩一小时，娱乐陪伴，轻松游戏体验。"
+            },
+            companion2: {
+                title: "78技术男陪一小时",
+                price: 78,
+                image: "https://via.placeholder.com/500x300?text=陪玩单78",
+                desc: "支付78元，技术男性陪玩一小时，专业指导，提升游戏技巧。"
+            },
+            companion3: {
+                title: "118技术女陪一小时",
+                price: 118,
+                image: "https://via.placeholder.com/500x300?text=陪玩单118",
+                desc: "支付118元，技术女性陪玩一小时，专业指导，提升游戏技巧。"
+            },
+            companion4: {
+                title: "158单局700w",
+                price: 158,
+                image: "https://via.placeholder.com/500x300?text=陪玩单158",
+                desc: "支付158元，陪玩单局带出700w哈夫币价值，专业陪伴保障收益。"
+            },
+            companion5: {
+                title: "488单局1000w",
+                price: 488,
+                image: "https://via.placeholder.com/500x300?text=陪玩单488",
+                desc: "支付488元，陪玩单局带出1000w哈夫币价值，专业陪伴保障收益。"
+            },
+            companion6: {
+                title: "238单局800w",
+                price: 238,
+                image: "https://via.placeholder.com/500x300?text=陪玩单238",
+                desc: "支付238元，陪玩单局带出800w哈夫币价值，专业陪伴保障收益。"
+            },
+            companion7: {
+                title: "118单局560w",
+                price: 118,
+                image: "https://via.placeholder.com/500x300?text=陪玩单118",
+                desc: "支付118元，陪玩单局带出560w哈夫币价值，专业陪伴保障收益。"
+            },
+            singleBigRed1: {
+                title: "单局大红保障",
+                price: 299,
+                image: "https://via.placeholder.com/500x300?text=单局大红单",
+                desc: "支付299元，单局大红物品保障服务，专业打手操作，必出大红。"
+            },
+            singleValue1: {
+                title: "高价值撤离保障",
+                price: 199,
+                image: "https://via.placeholder.com/500x300?text=单局带出价值",
+                desc: "支付199元，单局高价值撤离保障服务，专业打手操作，确保高价值撤离。"
+            },
+            africa1: {
+                title: "999手搓非洲之心",
+                price: 999,
+                image: "https://via.placeholder.com/500x300?text=非洲之心999",
+                desc: "支付999元，手搓非洲之心服务，单局必须1314w撤离，专业打手操作。"
+            },
+            africa2: {
+                title: "666不出非洲之心保底3888w",
+                price: 666,
+                image: "https://via.placeholder.com/500x300?text=非洲之心666",
+                desc: "支付666元，不出非洲之心保底3888w哈夫币价值，专业打手操作。"
+            },
+            farming1: {
+                title: "110代肝1000w",
+                price: 110,
+                image: "https://via.placeholder.com/500x300?text=代肝单110",
+                desc: "支付110元，代肝1000w哈夫币，解放你的时间，专业打手操作。"
+            },
+            farming2: {
+                title: "999代肝9格保险",
+                price: 999,
+                image: "https://via.placeholder.com/500x300?text=代肝单999",
+                desc: "支付999元，代肝9格保险，解放你的时间，专业打手操作。"
+            },
+            farming3: {
+                title: "188代肝带砖杀人任务",
+                price: 188,
+                image: "https://via.placeholder.com/500x300?text=代肝单188",
+                desc: "支付188元，代肝带砖杀人任务，解放你的时间，专业打手操作。"
+            },
+            farming4: {
+                title: "300代肝300w",
+                price: 300,
+                image: "https://via.placeholder.com/500x300?text=代肝单300",
+                desc: "支付300元，代肝300w哈夫币，解放你的时间，专业打手操作。"
+            },
+            farming5: {
+                title: "500代肝5000w",
+                price: 500,
+                image: "https://via.placeholder.com/500x300?text=代肝单500",
+                desc: "支付500元，代肝5000w哈夫币，解放你的时间，专业打手操作。"
+            },
+            farming6: {
+                title: "999代肝一个亿",
+                price: 999,
+                image: "https://via.placeholder.com/500x300?text=代肝单999",
+                desc: "支付999元，代肝一个亿哈夫币，解放你的时间，专业打手操作。"
+            },
+            rebate1: {
+                title: "打绝密保底388w",
+                price: 199,
+                image: "https://via.placeholder.com/500x300?text=大红返现单",
+                desc: "支付199元，打绝密保底388w哈夫币，专业打手操作，高性价比保障。"
+            },
+            rebate2: {
+                title: "出指定大红返现88.88",
+                price: 299,
+                image: "https://via.placeholder.com/500x300?text=大红返现单",
+                desc: "支付299元，出指定大红物品返现88.88元，专业打手操作，惊喜返现活动。"
+            }
+        };
+        
+        // 当前用户状态
+        let currentUser = null;
+        let selectedProduct = null;
+        let selectedAmount = 0;
+        let selectedPaymentMethod = null;
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化分类导航点击事件
+            const categoryItems = document.querySelectorAll('.category-item');
+            categoryItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // 移除所有active类
+                    categoryItems.forEach(i => i.classList.remove('active'));
+                    // 给当前点击项添加active类
+                    this.classList.add('active');
+                    // 显示对应的商品分类
+                    const category = this.getAttribute('data-category');
+                    showProductCategory(category);
+                });
+            });
+            
+            // 关闭开屏公告
+            document.getElementById('closeSplash').addEventListener('click', function() {
+                document.getElementById('splash').style.display = 'none';
+            });
+            
+            // 模拟用户登录
+            simulateLogin();
+        });
+        
+        // 显示商品分类
+        function showProductCategory(category) {
+            const productSections = document.querySelectorAll('.product-section');
+            productSections.forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(category).classList.add('active');
+        }
+        
+        // 显示商品详情
+        function showProductDetail(productId) {
+            const product = products[productId];
+            if (!product) return;
+            
+            selectedProduct = product;
+            
+            const modalBody = document.getElementById('productModalBody');
+            modalBody.innerHTML = `
+                <img src="${product.image}" class="modal-image">
+                <h3 class="modal-title">${product.title}</h3>
+                <div class="modal-price">¥${product.price.toFixed(2)}</div>
+                <p class="modal-desc">${product.desc}</p>
+                <button class="order-btn" onclick="showPaymentModal('product')">立即下单</button>
+            `;
+            
+            document.getElementById('productModal').style.display = 'flex';
+        }
+        
+        // 显示支付弹窗
+        function showPaymentModal(type) {
+            if (type === 'product' && selectedProduct) {
+                document.getElementById('paymentAmount').textContent = `¥${selectedProduct.price.toFixed(2)}`;
+                document.getElementById('paymentDesc').textContent = selectedProduct.title;
+            } else if (type === 'deposit' && selectedAmount > 0) {
+                document.getElementById('paymentAmount').textContent = `¥${selectedAmount.toFixed(2)}`;
+                document.getElementById('paymentDesc').textContent = '充值保证金';
+            } else {
+                alert('请先选择商品或充值金额');
+                return;
+            }
+            
+            // 重置支付方式选择
+            selectedPaymentMethod = null;
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            paymentMethods.forEach(method => {
+                method.style.border = 'none';
+            });
+            
+            closeModal('productModal');
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+        
+        // 选择支付方式
+        function selectPayment(method) {
+            selectedPaymentMethod = method;
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            paymentMethods.forEach(m => {
+                if (m.querySelector('span').textContent.includes(method === 'wechat' ? '微信' : '支付宝')) {
+                    m.style.border = '2px solid #ff6600';
+                } else {
+                    m.style.border = 'none';
+                }
+            });
+        }
+        
+        // 确认支付
+        function confirmPayment() {
+            if (!selectedPaymentMethod) {
+                alert('请选择支付方式');
+                return;
+            }
+            
+            let amount = 0;
+            let desc = '';
+            
+            if (selectedProduct) {
+                amount = selectedProduct.price;
+                desc = selectedProduct.title;
+            } else if (selectedAmount > 0) {
+                amount = selectedAmount;
+                desc = '充值保证金';
+            }
+            
+            alert(`正在跳转${selectedPaymentMethod === 'wechat' ? '微信' : '支付宝'}支付，金额：¥${amount.toFixed(2)}，商品：${desc}`);
+            
+            // 关闭支付弹窗
+            closeModal('paymentModal');
+            
+            // 如果是保证金充值，更新用户状态
+            if (selectedAmount > 0) {
+                updateUserDeposit(amount);
+                selectedAmount = 0;
+            }
+        }
+        
+        // 选择充值金额
+        function selectAmount(element, amount) {
+            selectedAmount = amount;
+            const amountOptions = document.querySelectorAll('.amount-option');
+            amountOptions.forEach(option => {
+                option.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+        
+        // 关闭弹窗
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // 显示页面
+        function showPage(pageId) {
+            const pages = ['mainPage', 'profilePage', 'customerService', 'deposit', 'hunterCenter', 'adminDashboard'];
+            pages.forEach(page => {
+                document.getElementById(page).style.display = 'none';
+            });
+            
+            document.getElementById(pageId).style.display = 'block';
+            
+            // 更新底部导航激活状态
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (pageId === 'mainPage') {
+                navItems[0].classList.add('active');
+            } else if (pageId === 'profilePage' || pageId === 'customerService' || pageId === 'deposit' || pageId === 'hunterCenter') {
+                navItems[1].classList.add('active');
+            } else if (pageId === 'adminDashboard') {
+                navItems[2].classList.add('active');
+            }
+        }
+        
+        // 模拟用户登录
+        function simulateLogin() {
+            currentUser = {
+                id: 'user123',
+                name: '三角洲玩家',
+                avatar: 'https://via.placeholder.com/60',
+                deposit: 0,
+                orders: {
+                    pendingPayment: 1,
+                    pendingOrder: 2,
+                    inService: 1,
+                    pendingCompletion: 0,
+                    completed: 5,
+                    afterSale: 0
+                },
+                isAdmin: true
+            };
+            
+            updateUserInfo();
+        }
+        
+        // 更新用户信息显示
+        function updateUserInfo() {
+            if (!currentUser) return;
+            
+            document.getElementById('userInfo').innerHTML = `
+                <img src="${currentUser.avatar}" alt="头像" class="user-avatar">
+                <span>${currentUser.name}</span>
+            `;
+            
+            document.getElementById('profileAvatar').src = currentUser.avatar;
+            document.getElementById('profileName').textContent = currentUser.name;
+            document.getElementById('profileId').textContent = `ID: ${currentUser.id}`;
+            
+            // 更新订单状态
+            document.getElementById('pendingPayment').textContent = currentUser.orders.pendingPayment;
+            document.getElementById('pendingOrder').textContent = currentUser.orders.pendingOrder;
+            document.getElementById('inService').textContent = currentUser.orders.inService;
+            document.getElementById('pendingCompletion').textContent = currentUser.orders.pendingCompletion;
+            document.getElementById('completed').textContent = currentUser.orders.completed;
+            document.getElementById('afterSale').textContent = currentUser.orders.afterSale;
+            
+            // 如果是管理员，显示管理入口
+            if (currentUser.isAdmin) {
+                const footerNav = document.querySelector('.footer-nav');
+                if (footerNav.children.length === 2) {
+                    const adminNav = document.createElement('div');
+                    adminNav.className = 'nav-item';
+                    adminNav.innerHTML = '<i class="fas fa-chart-line"></i><span>管理</span>';
+                    adminNav.onclick = function() { showPage('adminDashboard'); };
+                    footerNav.appendChild(adminNav);
+                }
+            }
+        }
+        
+        // 更新用户保证金
+        function updateUserDeposit(amount) {
+            if (!currentUser) return;
+            
+            currentUser.deposit += amount;
+            alert(`充值成功！当前保证金：¥${currentUser.deposit.toFixed(2)}`);
+        }
+        
+        // 提交打手申请
+        function submitHunterApplication() {
+            const realName = document.getElementById('realName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const gameId = document.getElementById('gameId').value;
+            
+            if (!realName || !phoneNumber || !gameId) {
+                alert('请填写完整信息');
+                return;
+            }
+            
+            if (!/^1[3-9]\d{9}$/.test(phoneNumber)) {
+                alert('请输入正确的手机号码');
+                return;
+            }
+            
+            alert('申请已提交，请等待审核');
+            showPage('profilePage');
+        }
+        
+        // 退出登录
+        function logout() {
+            currentUser = null;
+            alert('已退出登录');
+            showPage('mainPage');
+            
+            // 重置用户信息显示
+            document.getElementById('userInfo').innerHTML = `
+                <img src="https://via.placeholder.com/30" alt="头像" class="user-avatar">
+                <span>未登录</span>
+            `;
+            
+            document.getElementById('profileAvatar').src = 'https://via.placeholder.com/60';
+            document.getElementById('profileName').textContent = '未登录';
+            document.getElementById('profileId').textContent = 'ID: --';
+            
+            // 重置订单状态
+            document.getElementById('pendingPayment').textContent = '0';
+            document.getElementById('pendingOrder').textContent = '0';
+            document.getElementById('inService').textContent = '0';
+            document.getElementById('pendingCompletion').textContent = '0';
+            document.getElementById('completed').textContent = '0';
+            document.getElementById('afterSale').textContent = '0';
+        }
+    </script>
+</body>
+</html>
